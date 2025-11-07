@@ -90,7 +90,7 @@ local function CreateKeyGUI()
     Info.Size = UDim2.new(1, -40, 0, 80)
     Info.Position = UDim2.new(0, 20, 0, 80)
     Info.BackgroundTransparency = 1
-    Info.Text = "Доступные ключи: TEST1, TEST2, ANGRY666"
+    Info.Text = "🚀 Trade Strength Hub Premium"
     Info.TextColor3 = Color3.fromRGB(200, 200, 220)
     Info.TextSize = 14
     Info.Font = Enum.Font.Gotham
