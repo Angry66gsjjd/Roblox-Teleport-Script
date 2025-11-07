@@ -9,7 +9,7 @@ local KEY_CONFIG = {
     Enabled = true,
     MasterKey = "ANGRY666",
     KeyList = {"TEST1", "TEST2", "ANGRY666", "PREMIUM123"},
-    Whitelist = {"Angry66gsjjdYT", "DDOSLANDOX", "MRlegenda63", "TestUser"},
+    Whitelist = {"Angry66gsjjdYT", "DDOSLANDOX", "MRlegenda63", "DarkLordRoblox703"},
     KeyUrl = "https://raw.githubusercontent.com/Angry66gsjjd/Roblox-Teleport-Script/main/keys.json",
     BackupUrl = "https://pastebin.com/raw/fG0y3XEW"
 }
