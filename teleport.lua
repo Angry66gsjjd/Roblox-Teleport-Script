@@ -1,238 +1,234 @@
--- Trade Strength Simulator Teleport Script with Cloud Key System
+-- Trade Strength Simulator Teleport Script with Secure Key System
 local Player = game:GetService("Players").LocalPlayer
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local HttpService = game:GetService("HttpService")
 
--- Настройки облачной ключ-системы
+-- Настройки ключ-системы
 local KEY_SYSTEM = {
     ENABLED = true,
-    -- Ваш ключ для проверки
-    MASTER_KEY = "ANGRY666",
-    -- URL к вашему файлу с ключами на GitHub или другом хостинге
-    KEYS_URL = "https://raw.githubusercontent.com/Angry66gsjjd/Roblox-Teleport-Script/main/keys.json",
-    -- Резервный URL (можно использовать Pastebin, Discord Webhook и т.д.)
-    BACKUP_URL = "https://pastebin.com/fG0y3XEW",
-    -- Вайтлист ников
+    KEY = "ANGRY666",  -- Основной ключ
+    VALID_KEYS = {"TEST1", "TEST2", "ANGRY666", "PREMIUM123"},
     WHITELIST = {
         "Angry66gsjjdYT",
-        "DDOSLANDOX",
-        "MRlegenda63",
-        "TestUser"
+        "DDOSLANDOX", 
+        "MRlegenda63"
     }
 }
 
--- Функция для загрузки ключей с веб-хостинга
-local function loadKeysFromWeb()
-    local success, keysData = pcall(function()
-        -- Пробуем основной URL
-        local response = game:HttpGet(KEY_SYSTEM.KEYS_URL, true)
-        return HttpService:JSONDecode(response)
-    end)
-    
-    if not success then
-        -- Если основной URL не работает, пробуем резервный
-        success, keysData = pcall(function()
-            local response = game:HttpGet(KEY_SYSTEM.BACKUP_URL, true)
-            return HttpService:JSONDecode(response)
-        end)
-    end
-    
-    if success and keysData then
-        return keysData
-    end
-    
-    return nil
-end
-
--- Проверка ключа через облако
-local function validateKeyCloud(key)
-    if not KEY_SYSTEM.ENABLED then
-        return true
-    end
-    
-    local keysData = loadKeysFromWeb()
-    
-    if keysData and keysData.valid_keys then
-        for _, validKey in ipairs(keysData.valid_keys) do
-            if key:upper() == validKey:upper() then
-                return true
-            end
+-- Проверка ключа
+local function validateKey(key)
+    key = key:upper():gsub("%s+", "")
+    for _, validKey in ipairs(KEY_SYSTEM.VALID_KEYS) do
+        if key == validKey then
+            return true
         end
     end
-    
-    -- Резервная проверка локальным ключом
-    return key:upper() == KEY_SYSTEM.MASTER_KEY
+    return false
 end
 
--- Проверка вайтлиста через облако
-local function checkWhitelistCloud()
-    if not KEY_SYSTEM.ENABLED then
-        return true
-    end
-    
+-- Проверка вайтлиста
+local function checkWhitelist()
     local playerName = Player.Name
-    local keysData = loadKeysFromWeb()
-    
-    -- Проверка облачного вайтлиста
-    if keysData and keysData.whitelist then
-        for _, whitelistedName in ipairs(keysData.whitelist) do
-            if playerName:lower() == whitelistedName:lower() then
-                return true
-            end
-        end
-    end
-    
-    -- Проверка локального вайтлиста
     for _, whitelistedName in ipairs(KEY_SYSTEM.WHITELIST) do
         if playerName:lower() == whitelistedName:lower() then
             return true
         end
     end
-    
     return false
 end
 
--- Создание GUI для ввода ключа
+-- Создание GUI для ключ-системы
 local function createKeyGUI()
     local KeyGui = Instance.new("ScreenGui")
-    KeyGui.Name = "KeySystemGUI"
+    KeyGui.Name = "SecureKeySystem"
     KeyGui.Parent = Player:WaitForChild("PlayerGui")
     
+    -- Основной фрейм
     local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 450, 0, 350)
-    MainFrame.Position = UDim2.new(0.5, -225, 0.5, -175)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+    MainFrame.Size = UDim2.new(0, 500, 0, 400)
+    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
     MainFrame.BorderSizePixel = 0
+    MainFrame.ClipsDescendants = true
     MainFrame.Parent = KeyGui
     
     local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 15)
+    UICorner.CornerRadius = UDim.new(0, 20)
     UICorner.Parent = MainFrame
     
     -- Градиентный фон
     local Gradient = Instance.new("UIGradient")
     Gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 55)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 75))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 50)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 80))
     })
-    Gradient.Rotation = 45
+    Gradient.Rotation = 135
     Gradient.Parent = MainFrame
+    
+    -- Верхняя панель
+    local TopBar = Instance.new("Frame")
+    TopBar.Size = UDim2.new(1, 0, 0, 80)
+    TopBar.Position = UDim2.new(0, 0, 0, 0)
+    TopBar.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+    TopBar.BorderSizePixel = 0
+    TopBar.Parent = MainFrame
+    
+    local TopCorner = Instance.new("UICorner")
+    TopCorner.CornerRadius = UDim.new(0, 20)
+    TopCorner.Parent = TopBar
     
     -- Заголовок
     local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 70)
+    Title.Size = UDim2.new(1, 0, 1, 0)
     Title.Position = UDim2.new(0, 0, 0, 0)
-    Title.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
-    Title.Text = "🔐 PREMIUM KEY SYSTEM"
+    Title.BackgroundTransparency = 1
+    Title.Text = "🔐 SECURE ACCESS SYSTEM"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Title.TextSize = 22
+    Title.TextSize = 24
     Title.Font = Enum.Font.GothamBold
-    Title.Parent = MainFrame
+    Title.Parent = TopBar
     
-    local TitleCorner = Instance.new("UICorner")
-    TitleCorner.CornerRadius = UDim.new(0, 15)
-    TitleCorner.Parent = Title
+    -- Подзаголовок
+    local SubTitle = Instance.new("TextLabel")
+    SubTitle.Size = UDim2.new(1, -40, 0, 60)
+    SubTitle.Position = UDim2.new(0, 20, 0, 90)
+    SubTitle.BackgroundTransparency = 1
+    SubTitle.Text = "Trade Strength Teleporter v2.0\nby Angry66gsjjdYT"
+    SubTitle.TextColor3 = Color3.fromRGB(200, 200, 220)
+    SubTitle.TextSize = 16
+    SubTitle.Font = Enum.Font.Gotham
+    SubTitle.TextWrapped = true
+    SubTitle.Parent = MainFrame
     
-    -- Описание
-    local Desc = Instance.new("TextLabel")
-    Desc.Size = UDim2.new(1, -40, 0, 80)
-    Desc.Position = UDim2.new(0, 20, 0, 80)
-    Desc.BackgroundTransparency = 1
-    Desc.Text = "Для доступа к скрипту требуется ключ\n\nДоступные ключи: Test1, Test2, ANGRY666\nПолучите ключ у разработчика"
-    Desc.TextColor3 = Color3.fromRGB(200, 200, 220)
-    Desc.TextSize = 14
-    Desc.Font = Enum.Font.Gotham
-    Desc.TextWrapped = true
-    Desc.Parent = MainFrame
+    -- Информация о ключах
+    local KeyInfo = Instance.new("TextLabel")
+    KeyInfo.Size = UDim2.new(1, -40, 0, 50)
+    KeyInfo.Position = UDim2.new(0, 20, 0, 160)
+    KeyInfo.BackgroundTransparency = 1
+    KeyInfo.Text = "Доступные ключи: TEST1, TEST2, ANGRY666\nВайтлист: DDOSLANDOX, MRlegenda63"
+    KeyInfo.TextColor3 = Color3.fromRGB(180, 180, 200)
+    KeyInfo.TextSize = 14
+    KeyInfo.Font = Enum.Font.Gotham
+    KeyInfo.TextWrapped = true
+    KeyInfo.Parent = MainFrame
     
     -- Поле ввода ключа
     local KeyInput = Instance.new("TextBox")
-    KeyInput.Size = UDim2.new(1, -40, 0, 45)
-    KeyInput.Position = UDim2.new(0, 20, 0, 170)
-    KeyInput.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-    KeyInput.PlaceholderText = "Введите ключ здесь..."
+    KeyInput.Size = UDim2.new(1, -40, 0, 50)
+    KeyInput.Position = UDim2.new(0, 20, 0, 220)
+    KeyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+    KeyInput.PlaceholderText = "Введите ключ доступа..."
+    KeyInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 170)
     KeyInput.Text = ""
     KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    KeyInput.TextSize = 16
+    KeyInput.TextSize = 18
     KeyInput.Font = Enum.Font.Gotham
+    KeyInput.TextXAlignment = Enum.TextXAlignment.Center
     KeyInput.Parent = MainFrame
     
     local InputCorner = Instance.new("UICorner")
-    InputCorner.CornerRadius = UDim.new(0, 10)
+    InputCorner.CornerRadius = UDim.new(0, 12)
     InputCorner.Parent = KeyInput
     
     -- Кнопка подтверждения
     local SubmitButton = Instance.new("TextButton")
-    SubmitButton.Size = UDim2.new(1, -40, 0, 45)
-    SubmitButton.Position = UDim2.new(0, 20, 0, 230)
+    SubmitButton.Size = UDim2.new(1, -40, 0, 50)
+    SubmitButton.Position = UDim2.new(0, 20, 0, 285)
     SubmitButton.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
-    SubmitButton.Text = "✅ ПОДТВЕРДИТЬ КЛЮЧ"
+    SubmitButton.Text = "🚀 АКТИВИРОВАТЬ ДОСТУП"
     SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    SubmitButton.TextSize = 16
+    SubmitButton.TextSize = 18
     SubmitButton.Font = Enum.Font.GothamBold
     SubmitButton.Parent = MainFrame
     
     local ButtonCorner = Instance.new("UICorner")
-    ButtonCorner.CornerRadius = UDim.new(0, 10)
+    ButtonCorner.CornerRadius = UDim.new(0, 12)
     ButtonCorner.Parent = SubmitButton
     
-    -- Сообщение об ошибке
-    local ErrorLabel = Instance.new("TextLabel")
-    ErrorLabel.Size = UDim2.new(1, -40, 0, 25)
-    ErrorLabel.Position = UDim2.new(0, 20, 0, 285)
-    ErrorLabel.BackgroundTransparency = 1
-    ErrorLabel.Text = ""
-    ErrorLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-    ErrorLabel.TextSize = 12
-    ErrorLabel.Font = Enum.Font.Gotham
-    ErrorLabel.Parent = MainFrame
+    -- Статус
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Size = UDim2.new(1, -40, 0, 30)
+    StatusLabel.Position = UDim2.new(0, 20, 0, 345)
+    StatusLabel.BackgroundTransparency = 1
+    StatusLabel.Text = ""
+    StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    StatusLabel.TextSize = 14
+    StatusLabel.Font = Enum.Font.Gotham
+    StatusLabel.TextXAlignment = Enum.TextXAlignment.Center
+    StatusLabel.Parent = MainFrame
     
-    local function showError(message)
-        ErrorLabel.Text = message
-        wait(3)
-        ErrorLabel.Text = ""
-    end
-    
-    local function showSuccess(message)
-        ErrorLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        ErrorLabel.Text = message
-        wait(2)
-        ErrorLabel.Text = ""
-        ErrorLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-    end
-    
-    SubmitButton.MouseButton1Click:Connect(function()
-        local inputKey = KeyInput.Text:gsub("%s+", ""):upper()
-        
-        if inputKey == "" then
-            showError("❌ Введите ключ!")
-            return
-        end
-        
-        if validateKeyCloud(inputKey) or checkWhitelistCloud() then
-            showSuccess("✅ Ключ принят! Загрузка...")
-            wait(1)
-            KeyGui:Destroy()
-            loadMainScript()
+    local function showStatus(message, isSuccess)
+        StatusLabel.Text = message
+        if isSuccess then
+            StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
         else
-            showError("❌ Неверный ключ! Попробуйте: Test1, Test2")
+            StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
         end
-    end)
+    end
     
-    -- Автозаполнение при фокусе
-    KeyInput.Focused:Connect(function()
-        KeyInput.Text = ""
-    end)
-    
-    -- Анимация кнопки
+    -- Анимации кнопки
     SubmitButton.MouseEnter:Connect(function()
-        game:GetService("TweenService"):Create(SubmitButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 180, 255)}):Play()
+        game:GetService("TweenService"):Create(SubmitButton, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.fromRGB(100, 180, 255),
+            Size = UDim2.new(1, -30, 0, 55)
+        }):Play()
     end)
     
     SubmitButton.MouseLeave:Connect(function()
-        game:GetService("TweenService"):Create(SubmitButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 160, 255)}):Play()
+        game:GetService("TweenService"):Create(SubmitButton, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.fromRGB(80, 160, 255),
+            Size = UDim2.new(1, -40, 0, 50)
+        }):Play()
+    end)
+    
+    -- Обработчик ввода
+    SubmitButton.MouseButton1Click:Connect(function()
+        local inputKey = KeyInput.Text
+        
+        if inputKey == "" then
+            showStatus("❌ Введите ключ доступа!", false)
+            return
+        end
+        
+        if validateKey(inputKey) or checkWhitelist() then
+            showStatus("✅ Доступ разрешен! Загрузка...", true)
+            
+            -- Анимация успеха
+            game:GetService("TweenService"):Create(SubmitButton, TweenInfo.new(0.5), {
+                BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+            }):Play()
+            
+            wait(1.5)
+            KeyGui:Destroy()
+            loadMainScript()
+        else
+            showStatus("❌ Неверный ключ! Попробуйте: TEST1, TEST2", false)
+            
+            -- Анимация ошибки
+            local originalColor = KeyInput.BackgroundColor3
+            game:GetService("TweenService"):Create(KeyInput, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+            }):Play()
+            wait(0.5)
+            game:GetService("TweenService"):Create(KeyInput, TweenInfo.new(0.2), {
+                BackgroundColor3 = originalColor
+            }):Play()
+        end
+    end)
+    
+    -- Автоочистка при фокусе
+    KeyInput.Focused:Connect(function()
+        if KeyInput.Text == "Введите ключ доступа..." then
+            KeyInput.Text = ""
+        end
+    end)
+    
+    -- Enter для подтверждения
+    KeyInput.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            SubmitButton.MouseButton1Click:Fire()
+        end
     end)
     
     return KeyGui
@@ -240,243 +236,175 @@ end
 
 -- Основная функция загрузки скрипта
 function loadMainScript()
-    -- Альтернативная библиотека для GUI
-    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-    local Window = Library.CreateLib("🚀 Trade Strength Teleporter | Premium", "Midnight")
-
-    -- Позиции для телепортации
-    local teleportPositions = {
-        {name = "📍 Стартовая позиция", position = Vector3.new(28.120019912719727, 7.735681056976318, -354.760009765625)},
-        {name = "📍 Высокая точка 1", position = Vector3.new(-296.6466979980469, 87.49390411376953, -349.0245056152344)},
-        {name = "📍 Центральная зона", position = Vector3.new(-294.8343811035156, 88.18395233154297, -377.1786804199219)},
-        {name = "📍 Конечная точка", position = Vector3.new(-281.97833251953125, 88.0938720703125, -386.9106750488281)}
-    }
-
-    local currentPositionIndex = 1
-    local autoTeleportActive = false
-
-    -- Функция для радужного текста
-    local function createRainbowText()
-        local colors = {
-            Color3.fromRGB(255, 0, 0),    -- Красный
-            Color3.fromRGB(255, 165, 0),  -- Оранжевый
-            Color3.fromRGB(255, 255, 0),  -- Желтый
-            Color3.fromRGB(0, 255, 0),    -- Зеленый
-            Color3.fromRGB(0, 0, 255),    -- Синий
-            Color3.fromRGB(75, 0, 130),   -- Индиго
-            Color3.fromRGB(238, 130, 238) -- Фиолетовый
+    -- Используем простую библиотеку для GUI
+    local function createSimpleGUI()
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "TradeStrengthTeleporter"
+        ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+        
+        local MainFrame = Instance.new("Frame")
+        MainFrame.Size = UDim2.new(0, 400, 0, 500)
+        MainFrame.Position = UDim2.new(0, 20, 0, 20)
+        MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+        MainFrame.BorderSizePixel = 0
+        MainFrame.Active = true
+        MainFrame.Draggable = true
+        MainFrame.Parent = ScreenGui
+        
+        local UICorner = Instance.new("UICorner")
+        UICorner.CornerRadius = UDim.new(0, 15)
+        UICorner.Parent = MainFrame
+        
+        -- Градиент
+        local Gradient = Instance.new("UIGradient")
+        Gradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 55)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(55, 55, 85))
+        })
+        Gradient.Rotation = 45
+        Gradient.Parent = MainFrame
+        
+        -- Заголовок
+        local Title = Instance.new("TextLabel")
+        Title.Size = UDim2.new(1, 0, 0, 60)
+        Title.Position = UDim2.new(0, 0, 0, 0)
+        Title.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+        Title.Text = "🚀 TRADE STRENGTH TELEPORTER"
+        Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Title.TextSize = 18
+        Title.Font = Enum.Font.GothamBold
+        Title.Parent = MainFrame
+        
+        local TitleCorner = Instance.new("UICorner")
+        TitleCorner.CornerRadius = UDim.new(0, 15)
+        TitleCorner.Parent = Title
+        
+        -- Позиции для телепортации
+        local teleportPositions = {
+            {name = "📍 Стартовая позиция", position = Vector3.new(28.120019912719727, 7.735681056976318, -354.760009765625)},
+            {name = "📍 Высокая точка 1", position = Vector3.new(-296.6466979980469, 87.49390411376953, -349.0245056152344)},
+            {name = "📍 Центральная зона", position = Vector3.new(-294.8343811035156, 88.18395233154297, -377.1786804199219)},
+            {name = "📍 Конечная точка", position = Vector3.new(-281.97833251953125, 88.0938720703125, -386.9106750488281)}
         }
-        
-        local currentColorIndex = 1
-        local connection
-        
-        connection = RunService.Heartbeat:Connect(function()
-            if Window then
-                -- Обновляем название окна с радужным эффектом
-                Window:ChangeText("🚀 Trade Strength Teleporter | Premium | by Angry66gsjjdYT")
-            end
-        end)
-        
-        return connection
-    end
 
-    -- Запускаем радужный текст
-    local rainbowConnection = createRainbowText()
+        local currentPositionIndex = 1
+        local autoTeleportActive = false
 
-    -- Функция телепортации
-    function teleportToPosition(position, positionName)
-        local character = Player.Character
-        if character then
-            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-            if humanoidRootPart then
-                -- Плавная телепортация
-                local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-                local tween = TweenService:Create(humanoidRootPart, tweenInfo, {CFrame = CFrame.new(position)})
-                tween:Play()
-                
-                print("✅ Телепортирован: " .. positionName)
-            else
-                warn("HumanoidRootPart не найден!")
-            end
-        else
-            warn("Персонаж не найден!")
-        end
-    end
-
-    -- Функция последовательной телепортации
-    function teleportToNextPosition()
-        if currentPositionIndex <= #teleportPositions then
-            local nextPosition = teleportPositions[currentPositionIndex].position
-            local positionName = teleportPositions[currentPositionIndex].name
-            teleportToPosition(nextPosition, positionName)
-            currentPositionIndex = currentPositionIndex + 1
-            
-            if currentPositionIndex > #teleportPositions then
-                currentPositionIndex = 1
-                print("🔁 Цикл завершен. Начинаем сначала.")
+        -- Функция телепортации
+        local function teleportToPosition(position, positionName)
+            local character = Player.Character
+            if character then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                    local tween = TweenService:Create(humanoidRootPart, tweenInfo, {CFrame = CFrame.new(position)})
+                    tween:Play()
+                    print("✅ Телепортирован: " .. positionName)
+                end
             end
         end
-    end
 
-    -- Функция автоматической телепортации
-    function autoTeleportAll()
-        print("🚀 Запуск автоматической телепортации...")
-        autoTeleportActive = true
+        -- Создание кнопок телепортации
+        local PositionsFrame = Instance.new("ScrollingFrame")
+        PositionsFrame.Size = UDim2.new(1, -20, 0, 300)
+        PositionsFrame.Position = UDim2.new(0, 10, 0, 70)
+        PositionsFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+        PositionsFrame.BorderSizePixel = 0
+        PositionsFrame.ScrollBarThickness = 6
+        PositionsFrame.Parent = MainFrame
         
+        local PositionsCorner = Instance.new("UICorner")
+        PositionsCorner.CornerRadius = UDim.new(0, 10)
+        PositionsCorner.Parent = PositionsFrame
+
         for i, posData in ipairs(teleportPositions) do
-            if not autoTeleportActive then break end
-            teleportToPosition(posData.position, posData.name .. " (" .. i .. "/" .. #teleportPositions .. ")")
-            wait(2)
+            local Button = Instance.new("TextButton")
+            Button.Size = UDim2.new(1, -10, 0, 50)
+            Button.Position = UDim2.new(0, 5, 0, (i-1) * 55)
+            Button.BackgroundColor3 = Color3.fromRGB(60, 60, 85)
+            Button.Text = posData.name
+            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.TextSize = 14
+            Button.Font = Enum.Font.Gotham
+            Button.Parent = PositionsFrame
+            
+            local ButtonCorner = Instance.new("UICorner")
+            ButtonCorner.CornerRadius = UDim.new(0, 8)
+            ButtonCorner.Parent = Button
+            
+            Button.MouseButton1Click:Connect(function()
+                teleportToPosition(posData.position, posData.name)
+            end)
         end
+
+        PositionsFrame.CanvasSize = UDim2.new(0, 0, 0, #teleportPositions * 55)
+
+        -- Кнопка следующей позиции
+        local NextButton = Instance.new("TextButton")
+        NextButton.Size = UDim2.new(1, -20, 0, 40)
+        NextButton.Position = UDim2.new(0, 10, 0, 385)
+        NextButton.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
+        NextButton.Text = "🔄 Следующая позиция (F)"
+        NextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        NextButton.TextSize = 14
+        NextButton.Font = Enum.Font.Gotham
+        NextButton.Parent = MainFrame
         
-        if autoTeleportActive then
-            print("✅ Автоматическая телепортация завершена!")
-            autoTeleportActive = false
-        end
-    end
+        local NextCorner = Instance.new("UICorner")
+        NextCorner.CornerRadius = UDim.new(0, 8)
+        NextCorner.Parent = NextButton
 
-    -- Создание вкладок
-    local MainTab = Window:NewTab("🎯 Телепорт")
-    local PositionsSection = MainTab:NewSection("Быстрая телепортация")
-
-    -- Создание кнопок для каждой позиции
-    for i, posData in ipairs(teleportPositions) do
-        PositionsSection:NewButton(posData.name, "Телепортироваться в " .. posData.name, function()
-            teleportToPosition(posData.position, posData.name)
+        NextButton.MouseButton1Click:Connect(function()
+            if currentPositionIndex <= #teleportPositions then
+                local nextPosition = teleportPositions[currentPositionIndex].position
+                local positionName = teleportPositions[currentPositionIndex].name
+                teleportToPosition(nextPosition, positionName)
+                currentPositionIndex = currentPositionIndex + 1
+                if currentPositionIndex > #teleportPositions then
+                    currentPositionIndex = 1
+                end
+            end
         end)
+
+        -- Информация
+        local InfoLabel = Instance.new("TextLabel")
+        InfoLabel.Size = UDim2.new(1, -20, 0, 40)
+        InfoLabel.Position = UDim2.new(0, 10, 0, 435)
+        InfoLabel.BackgroundTransparency = 1
+        InfoLabel.Text = "by Angry66gsjjdYT | 👑 DDOSLANDOX, MRlegenda63"
+        InfoLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+        InfoLabel.TextSize = 12
+        InfoLabel.Font = Enum.Font.Gotham
+        InfoLabel.Parent = MainFrame
+
+        -- Обработчики клавиш
+        UIS.InputBegan:Connect(function(input)
+            if input.KeyCode == Enum.KeyCode.F then
+                NextButton.MouseButton1Click:Fire()
+            end
+        end)
+
+        return ScreenGui
     end
 
-    local AutoSection = MainTab:NewSection("Автоматизация")
-
-    AutoSection:NewButton("🔄 Следующая позиция (F)", "Телепортироваться к следующей точке", function()
-        teleportToNextPosition()
-    end)
-
-    AutoSection:NewToggle("⚡ Авто-телепорт всех точек", "Автоматически телепортироваться по всем точкам", function(state)
-        autoTeleportActive = state
-        if state then
-            autoTeleportAll()
-        end
-    end)
-
-    local SettingsTab = Window:NewTab("⚙️ Настройки")
-    local ControlSection = SettingsTab:NewSection("Управление")
-
-    ControlSection:NewKeybind("Открыть/Закрыть меню", "Показать или скрыть интерфейс", Enum.KeyCode.RightShift, function()
-        Library:ToggleUI()
-    end)
-
-    local InfoTab = Window:NewTab("📱 Информация")
-    local InfoSection = InfoTab:NewSection("О программе")
-
-    -- Радужный текст в информации
-    InfoSection:NewLabel("🎨 Trade Strength Teleporter v2.0")
-    InfoSection:NewLabel("🌈 by Angry66gsjjdYT")
-    InfoSection:NewLabel("🔐 Premium Version")
-    InfoSection:NewLabel("👑 Whitelisted Users: DDOSLANDOX, MRlegenda63")
-    InfoSection:NewLabel("")
-    InfoSection:NewLabel("✨ Особенности:")
-    InfoSection:NewLabel("• Плавная телепортация")
-    InfoSection:NewLabel("• Автоматический цикл")
-    InfoSection:NewLabel("• Радужный дизайн")
-    InfoSection:NewLabel("• Горячие клавиши")
-    InfoSection:NewLabel("• Защита ключом")
-    InfoSection:NewLabel("")
-    InfoSection:NewLabel("🎮 Управление:")
-    InfoSection:NewLabel("F - Следующая позиция")
-    InfoSection:NewLabel("G - Авто-телепорт")
-    InfoSection:NewLabel("RightShift - Меню")
-
-    -- Обработчики клавиш
-    UIS.InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.F then
-            teleportToNextPosition()
-        elseif input.KeyCode == Enum.KeyCode.G then
-            autoTeleportActive = not autoTeleportActive
-            if autoTeleportActive then
-                autoTeleportAll()
-            else
-                print("⏹️ Авто-телепортация остановлена")
-            end
-        end
-    end)
-
-    -- Функция для красивого вывода в консоль
-    local function printRainbowText()
-        local rainbowText = [[
-        
-     🎭┌────────────────────────────────────────┐
-      │   🚀 TRADE STRENGTH TELEPORTER v2.0   │
-      │           🌈 by Angry66gsjjdYT         │
-      │           🔐 PREMIUM VERSION           │
-      │        👑 WHITELIST: DDOSLANDOX        │
-      │             MRlegenda63               │
-      └────────────────────────────────────────┘
-        ]]
-        print(rainbowText)
-    end
-
-    printRainbowText()
-    print("📋 Управление:")
-    print("   F - Следующая позиция")
-    print("   G - Авто-телепорт всех точек") 
-    print("   RightShift - Открыть/закрыть меню")
-    print("")
-    print("   🎨 Радужный интерфейс активирован!")
-    print("   🔐 Премиум версия активирована!")
-    print("   👑 Вайтлист: DDOSLANDOX, MRlegenda63")
-    print("   made by Angry66gsjjdYT")
-
-    -- Очистка при выходе
-    game:GetService("Players").PlayerRemoving:Connect(function(leavingPlayer)
-        if leavingPlayer == Player then
-            if rainbowConnection then
-                rainbowConnection:Disconnect()
-            end
-        end
-    end)
+    -- Запускаем простой GUI
+    createSimpleGUI()
+    
+    print("🎮 Trade Strength Teleporter v2.0 активирован!")
+    print("👑 Премиум доступ: DDOSLANDOX, MRlegenda63")
+    print("🔑 Ключ-система: TEST1, TEST2")
+    print("🎯 Управление: F - Следующая позиция")
 end
 
 -- Основная инициализация
 if KEY_SYSTEM.ENABLED then
-    if checkWhitelistCloud() then
-        -- Если пользователь в вайтлисте
-        print("👑 Вайтлист пользователь обнаружен!")
+    if checkWhitelist() then
+        print("👑 Вайтлист пользователь обнаружен: " .. Player.Name)
         loadMainScript()
     else
-        -- Показываем GUI для ввода ключа
+        print("🔐 Запуск ключ-системы...")
         createKeyGUI()
     end
 else
-    -- Если ключ-система отключена
     loadMainScript()
 end
-
--- Функция для создания файла keys.json для GitHub
-local function generateKeysTemplate()
-    local keysTemplate = {
-        valid_keys = {
-            "ANGRY666",
-            "TEST1",
-            "TEST2",
-            "PREMIUM123"
-        },
-        whitelist = {
-            "Angry66gsjjdYT",
-            "DDOSLANDOX",
-            "MRlegenda63",
-            "TestUser"
-        },
-        settings = {
-            version = "2.0",
-            author = "Angry66gsjjdYT",
-            game = "Trade Strength Simulator"
-        }
-    }
-    
-    print("📁 Template for keys.json (for GitHub):")
-    print(HttpService:JSONEncode(keysTemplate))
-end
-
--- Генерируем шаблон при запуске (можно убрать потом)
-generateKeysTemplate()
