@@ -300,9 +300,9 @@ function LoadMainScript()
 
     -- Teleport positions
     local Positions = {
-        {name = "📍 Start Position", pos = Vector3.new(28.12, 7.73, -354.76)},
-        {name = "📍 High Point 1", pos = Vector3.new(-296.65, 87.49, -349.02)},
+        --{name = "📍 Start Position", pos = Vector3.new(28.12, 7.73, -354.76)},
         {name = "📍 Central Zone", pos = Vector3.new(-294.83, 88.18, -377.18)},
+        {name = "📍 High Point 1", pos = Vector3.new(-296.65, 87.49, -349.02)},
         {name = "📍 End Point", pos = Vector3.new(-281.98, 88.09, -386.91)}
     }
 
