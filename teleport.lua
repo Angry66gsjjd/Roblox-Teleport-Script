@@ -13,7 +13,7 @@ local KEY_SYSTEM = {
     -- URL к вашему файлу с ключами на GitHub или другом хостинге
     KEYS_URL = "https://raw.githubusercontent.com/Angry66gsjjd/Roblox-Teleport-Script/main/keys.json",
     -- Резервный URL (можно использовать Pastebin, Discord Webhook и т.д.)
-    BACKUP_URL = "https://pastebin.com/raw/YourPasteID",
+    BACKUP_URL = "https://pastebin.com/fG0y3XEW",
     -- Вайтлист ников
     WHITELIST = {
         "Angry66gsjjdYT",
