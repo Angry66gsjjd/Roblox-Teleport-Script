@@ -10,7 +10,7 @@ local KEY_CONFIG = {
     KeyList = {"TEST1", "TEST2", "ANGRY666", "PREMIUM123"},
     Whitelist = {"Angry66gsjjdYT", "DDOSLANDOX", "MRlegenda63", "TestUser"},
     KeyUrl = "https://raw.githubusercontent.com/Angry66gsjjd/Roblox-Teleport-Script/main/keys.json",
-    BackupUrl = "https://pastebin.com/fG0y3XEW"
+    BackupUrl = "https://pastebin.com/raw/fG0y3XEW"
 }
 
 -- Load keys from web
@@ -48,57 +48,48 @@ local function ValidateKey(inputKey)
     return inputKey == KEY_CONFIG.MasterKey
 end
 
--- Whitelist check
-local function CheckWhitelist()
-    local playerName = Player.Name:lower()
-    for _, name in ipairs(KEY_CONFIG.Whitelist) do
-        if playerName == name:lower() then return true end
-    end
-    return false
-end
-
--- Create key GUI
+-- Create key GUI (показывается ВСЕМ, даже вайтлисту)
 local function CreateKeyGUI()
     local KeyGui = Instance.new("ScreenGui")
     KeyGui.Name = "KeySystemGUI"
     KeyGui.Parent = Player.PlayerGui
 
     local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 400, 0, 300)
-    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+    MainFrame.Size = UDim2.new(0, 500, 0, 400)
+    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
     MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
     MainFrame.BorderSizePixel = 0
     MainFrame.Parent = KeyGui
 
     local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 12)
+    UICorner.CornerRadius = UDim.new(0, 15)
     UICorner.Parent = MainFrame
 
     -- Header
     local Header = Instance.new("Frame")
-    Header.Size = UDim2.new(1, 0, 0, 50)
+    Header.Size = UDim2.new(1, 0, 0, 70)
     Header.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
     Header.Parent = MainFrame
 
     local HeaderCorner = Instance.new("UICorner")
-    HeaderCorner.CornerRadius = UDim.new(0, 12)
+    HeaderCorner.CornerRadius = UDim.new(0, 15)
     HeaderCorner.Parent = Header
 
     local Title = Instance.new("TextLabel")
     Title.Size = UDim2.new(1, 0, 1, 0)
     Title.BackgroundTransparency = 1
-    Title.Text = "🔐 KEY SYSTEM"
+    Title.Text = "🔐 KEY SYSTEM REQUIRED"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Title.TextSize = 20
+    Title.TextSize = 24
     Title.Font = Enum.Font.GothamBold
     Title.Parent = Header
 
     -- Info
     local Info = Instance.new("TextLabel")
-    Info.Size = UDim2.new(1, -40, 0, 60)
-    Info.Position = UDim2.new(0, 20, 0, 60)
+    Info.Size = UDim2.new(1, -40, 0, 80)
+    Info.Position = UDim2.new(0, 20, 0, 80)
     Info.BackgroundTransparency = 1
-    Info.Text = "Trade Strength Teleporter v2.0\nby Angry66gsjjdYT\n\nKeys: TEST1, TEST2, ANGRY666"
+    Info.Text = "Trade Strength Teleporter v2.0\nby Angry66gsjjdYT\n\nДоступные ключи: TEST1, TEST2, ANGRY666\nВайтлист пользователи также должны ввести ключ!"
     Info.TextColor3 = Color3.fromRGB(200, 200, 220)
     Info.TextSize = 14
     Info.Font = Enum.Font.Gotham
@@ -107,44 +98,46 @@ local function CreateKeyGUI()
 
     -- Key input
     local KeyBox = Instance.new("TextBox")
-    KeyBox.Size = UDim2.new(1, -40, 0, 40)
-    KeyBox.Position = UDim2.new(0, 20, 0, 130)
+    KeyBox.Size = UDim2.new(1, -40, 0, 50)
+    KeyBox.Position = UDim2.new(0, 20, 0, 170)
     KeyBox.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-    KeyBox.PlaceholderText = "Enter key..."
+    KeyBox.PlaceholderText = "Введите ключ..."
     KeyBox.Text = ""
     KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    KeyBox.TextSize = 16
+    KeyBox.TextSize = 18
     KeyBox.Font = Enum.Font.Gotham
+    KeyBox.TextXAlignment = Enum.TextXAlignment.Center
     KeyBox.Parent = MainFrame
 
     local KeyCorner = Instance.new("UICorner")
-    KeyCorner.CornerRadius = UDim.new(0, 8)
+    KeyCorner.CornerRadius = UDim.new(0, 10)
     KeyCorner.Parent = KeyBox
 
     -- Submit button
     local SubmitBtn = Instance.new("TextButton")
-    SubmitBtn.Size = UDim2.new(1, -40, 0, 40)
-    SubmitBtn.Position = UDim2.new(0, 20, 0, 180)
+    SubmitBtn.Size = UDim2.new(1, -40, 0, 50)
+    SubmitBtn.Position = UDim2.new(0, 20, 0, 230)
     SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-    SubmitBtn.Text = "✅ ACTIVATE"
+    SubmitBtn.Text = "✅ АКТИВИРОВАТЬ"
     SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    SubmitBtn.TextSize = 16
+    SubmitBtn.TextSize = 18
     SubmitBtn.Font = Enum.Font.GothamBold
     SubmitBtn.Parent = MainFrame
 
     local BtnCorner = Instance.new("UICorner")
-    BtnCorner.CornerRadius = UDim.new(0, 8)
+    BtnCorner.CornerRadius = UDim.new(0, 10)
     BtnCorner.Parent = SubmitBtn
 
     -- Status
     local Status = Instance.new("TextLabel")
-    Status.Size = UDim2.new(1, -40, 0, 30)
-    Status.Position = UDim2.new(0, 20, 0, 230)
+    Status.Size = UDim2.new(1, -40, 0, 40)
+    Status.Position = UDim2.new(0, 20, 0, 290)
     Status.BackgroundTransparency = 1
     Status.Text = ""
     Status.TextColor3 = Color3.fromRGB(255, 50, 50)
     Status.TextSize = 14
     Status.Font = Enum.Font.Gotham
+    Status.TextXAlignment = Enum.TextXAlignment.Center
     Status.Parent = MainFrame
 
     -- Button animations
@@ -160,18 +153,18 @@ local function CreateKeyGUI()
     SubmitBtn.MouseButton1Click:Connect(function()
         local key = KeyBox.Text:gsub("%s+", "")
         if key == "" then
-            Status.Text = "❌ Please enter a key"
+            Status.Text = "❌ Пожалуйста, введите ключ"
             return
         end
 
-        if ValidateKey(key) or CheckWhitelist() then
+        if ValidateKey(key) then
             Status.TextColor3 = Color3.fromRGB(50, 255, 50)
-            Status.Text = "✅ Access granted! Loading..."
-            wait(1)
+            Status.Text = "✅ Ключ принят! Загрузка..."
+            wait(1.5)
             KeyGui:Destroy()
             LoadMainScript()
         else
-            Status.Text = "❌ Invalid key! Try: TEST1, TEST2"
+            Status.Text = "❌ Неверный ключ! Попробуйте: TEST1, TEST2"
         end
     end)
 
@@ -187,7 +180,7 @@ end
 
 -- Main script loader
 function LoadMainScript()
-    -- Simple GUI like Speed Hub X
+    -- Simple GUI
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "TradeStrengthHub"
     ScreenGui.Parent = Player.PlayerGui
@@ -228,7 +221,7 @@ function LoadMainScript()
     SubTitle.Size = UDim2.new(1, 0, 0, 20)
     SubTitle.Position = UDim2.new(0, 0, 0, 50)
     SubTitle.BackgroundTransparency = 1
-    SubTitle.Text = "by Angry66gsjjdYT | Whitelist: DDOSLANDOX, MRlegenda63"
+    SubTitle.Text = "by Angry66gsjjdYT | Key System: ACTIVE"
     SubTitle.TextColor3 = Color3.fromRGB(180, 180, 200)
     SubTitle.TextSize = 11
     SubTitle.Font = Enum.Font.Gotham
@@ -321,18 +314,13 @@ function LoadMainScript()
     end)
 
     print("🚀 Trade Strength Hub loaded!")
-    print("👑 Whitelist: DDOSLANDOX, MRlegenda63")
+    print("🔐 Key System: ACTIVE")
     print("🎯 Controls: F - Next position")
 end
 
--- INIT
+-- INIT - Ключ-система показывается ВСЕМ
 if KEY_CONFIG.Enabled then
-    if CheckWhitelist() then
-        print("👑 Whitelist access granted for: " .. Player.Name)
-        LoadMainScript()
-    else
-        CreateKeyGUI()
-    end
+    CreateKeyGUI()
 else
     LoadMainScript()
 end
