@@ -9,8 +9,8 @@ local KEY_CONFIG = {
     MasterKey = "ANGRY666",
     KeyList = {"TEST1", "TEST2", "ANGRY666", "PREMIUM123"},
     Whitelist = {"Angry66gsjjdYT", "DDOSLANDOX", "MRlegenda63", "TestUser"},
-    KeyUrl = "https://raw.githubusercontent.com/Angry66gsjjdYT/KeysRepository/main/keys.json",
-    BackupUrl = "https://pastebin.com/raw/YourPasteID"
+    KeyUrl = "https://raw.githubusercontent.com/Angry66gsjjd/Roblox-Teleport-Script/main/keys.json",
+    BackupUrl = "https://pastebin.com/fG0y3XEW"
 }
 
 -- Load keys from web
