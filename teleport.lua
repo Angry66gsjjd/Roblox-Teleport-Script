@@ -1,4 +1,3 @@
--- Trade Strength Teleporter Premium by Angry66gsjjdYT
 local Player = game:GetService("Players").LocalPlayer
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
@@ -91,7 +90,7 @@ local function CreateKeyGUI()
     Info.Size = UDim2.new(1, -40, 0, 80)
     Info.Position = UDim2.new(0, 20, 0, 80)
     Info.BackgroundTransparency = 1
-    Info.Text = "Trade Strength Teleporter Premium\nby Angry66gsjjdYT\n\nДоступные ключи: TEST1, TEST2, ANGRY666"
+    Info.Text = "Доступные ключи: TEST1, TEST2, ANGRY666"
     Info.TextColor3 = Color3.fromRGB(200, 200, 220)
     Info.TextSize = 14
     Info.Font = Enum.Font.Gotham
@@ -422,39 +421,6 @@ function LoadMainScript()
 
     yPosButtons = yPosButtons + 45
 
-    -- Collect Speed Slider
-    local CollectSpeedLabel = Instance.new("TextLabel")
-    CollectSpeedLabel.Size = UDim2.new(1, -10, 0, 25)
-    CollectSpeedLabel.Position = UDim2.new(0, 5, 0, yPosButtons)
-    CollectSpeedLabel.BackgroundTransparency = 1
-    CollectSpeedLabel.Text = "Collect Speed: 0.1s"
-    CollectSpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    CollectSpeedLabel.TextSize = 14
-    CollectSpeedLabel.Font = Enum.Font.Gotham
-    CollectSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
-    CollectSpeedLabel.Parent = ButtonsTab
-
-    local CollectSpeedSlider = Instance.new("Frame")
-    CollectSpeedSlider.Size = UDim2.new(1, -10, 0, 20)
-    CollectSpeedSlider.Position = UDim2.new(0, 5, 0, yPosButtons + 25)
-    CollectSpeedSlider.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-    CollectSpeedSlider.Parent = ButtonsTab
-
-    local CollectSpeedFill = Instance.new("Frame")
-    CollectSpeedFill.Size = UDim2.new(0.3, 0, 1, 0)
-    CollectSpeedFill.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
-    CollectSpeedFill.Parent = CollectSpeedSlider
-
-    local SliderCornerBtn = Instance.new("UICorner")
-    SliderCornerBtn.CornerRadius = UDim.new(0, 4)
-    SliderCornerBtn.Parent = CollectSpeedSlider
-
-    local FillCornerBtn = Instance.new("UICorner")
-    FillCornerBtn.CornerRadius = UDim.new(0, 4)
-    FillCornerBtn.Parent = CollectSpeedFill
-
-    yPosButtons = yPosButtons + 55
-
     -- Individual Collect Buttons
     local buttonTypes = {
         {name = "💎 Diamond Button", item = "BDiamond", color = Color3.fromRGB(0, 200, 255)},
@@ -596,17 +562,26 @@ function LoadMainScript()
         {name = "🍌 Banana", path = "workspace.RespawnMobs.Banana.Banana"}
     }
 
-    -- Function to teleport mob to player
-    local function TeleportMobToPlayer(mobPath, mobName)
+    -- Function to teleport to mob
+    local function TeleportToMob(mobPath, mobName)
         local success, mob = pcall(function()
-            return game:GetService(mobPath)
+            -- Get the mob object using the path
+            local pathParts = mobPath:split(".")
+            local current = game
+            for _, part in ipairs(pathParts) do
+                current = current:FindFirstChild(part)
+                if not current then break end
+            end
+            return current
         end)
         
         if success and mob then
             local char = Player.Character
             if char and char:FindFirstChild("HumanoidRootPart") then
-                mob.CFrame = char.HumanoidRootPart.CFrame
-                print("✅ Teleported: " .. mobName)
+                -- Телепортируем игрока к мобу
+                local tween = TweenService:Create(char.HumanoidRootPart, TweenInfo.new(0.5), {CFrame = mob.CFrame})
+                tween:Play()
+                print("✅ Teleported to: " .. mobName)
             else
                 print("❌ Player character not found")
             end
@@ -615,13 +590,13 @@ function LoadMainScript()
         end
     end
 
-    -- Function to teleport all mobs
-    local function TeleportAllMobs()
+    -- Function to teleport to all mobs
+    local function TeleportToAllMobs()
         for _, mob in ipairs(mobs) do
-            TeleportMobToPlayer(mob.path, mob.name)
-            wait(0.1) -- Small delay to avoid lag
+            TeleportToMob(mob.path, mob.name)
+            wait(0.5) -- Delay between teleports
         end
-        print("✅ All mobs teleported!")
+        print("✅ Teleported to all mobs!")
     end
 
     local yPosMobs = 10
@@ -631,7 +606,7 @@ function LoadMainScript()
     TeleportAllMobsBtn.Size = UDim2.new(1, -10, 0, 40)
     TeleportAllMobsBtn.Position = UDim2.new(0, 5, 0, yPosMobs)
     TeleportAllMobsBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
-    TeleportAllMobsBtn.Text = "🎯 TELEPORT ALL MOBS"
+    TeleportAllMobsBtn.Text = "🎯 TELEPORT TO ALL MOBS"
     TeleportAllMobsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     TeleportAllMobsBtn.TextSize = 14
     TeleportAllMobsBtn.Font = Enum.Font.GothamBold
@@ -641,7 +616,7 @@ function LoadMainScript()
     AllMobsCorner.CornerRadius = UDim.new(0, 6)
     AllMobsCorner.Parent = TeleportAllMobsBtn
 
-    TeleportAllMobsBtn.MouseButton1Click:Connect(TeleportAllMobs)
+    TeleportAllMobsBtn.MouseButton1Click:Connect(TeleportToAllMobs)
 
     yPosMobs = yPosMobs + 50
 
@@ -662,7 +637,7 @@ function LoadMainScript()
         MobCorner.Parent = MobBtn
         
         MobBtn.MouseButton1Click:Connect(function()
-            TeleportMobToPlayer(mob.path, mob.name)
+            TeleportToMob(mob.path, mob.name)
         end)
         
         yPosMobs = yPosMobs + 40
@@ -825,7 +800,7 @@ function LoadMainScript()
     InfoText.Size = UDim2.new(1, -10, 1, -10)
     InfoText.Position = UDim2.new(0, 5, 0, 5)
     InfoText.BackgroundTransparency = 1
-    InfoText.Text = "Trade Strength Hub Premium\nby Angry66gsjjdYT\n\nVersion: 2.0\nKey System: ACTIVE\n\nFeatures:\n• 4 Teleport Positions\n• Auto Farm System\n• Button Collector\n• Mob Teleporter\n• Local Player Scripts\n• Custom Settings\n\nControls:\nF - Next Position\nZ - Auto Collect\nRightShift - Toggle GUI"
+    InfoText.Text = "Trade Strength Hub Premium\n\nVersion: 2.0\nKey System: ACTIVE\n\nFeatures:\n• 4 Teleport Positions\n• Auto Farm System\n• Button Collector\n• Mob Teleporter\n• Local Player Scripts\n• Custom Settings\n\nControls:\nF - Next Position\nZ - Auto Collect\nRightShift - Toggle GUI"
     InfoText.TextColor3 = Color3.fromRGB(255, 255, 255)
     InfoText.TextSize = 12
     InfoText.Font = Enum.Font.Gotham
