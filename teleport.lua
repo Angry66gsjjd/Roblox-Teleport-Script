@@ -247,7 +247,7 @@ function LoadMainScript()
     local TabContents = {}
 
     -- Create tabs
-    local tabs = {"MAIN", "LOCAL PLAYER", "SETTINGS", "INFO"}
+    local tabs = {"MAIN", "BUTTONS", "MOBS", "LOCAL PLAYER", "SETTINGS", "INFO"}
 
     for i, tabName in ipairs(tabs) do
         -- Tab button
@@ -393,6 +393,280 @@ function LoadMainScript()
             if currentIndex > #Positions then currentIndex = 1 end
         end
     end)
+
+    -- ========== BUTTONS TAB ==========
+    local ButtonsTab = TabContents["BUTTONS"]
+    ButtonsTab.CanvasSize = UDim2.new(0, 0, 0, 500)
+
+    local autoCollectEnabled = false
+    local collectKey = Enum.KeyCode.Z
+    local collectSpeed = 0.1
+    local collectConnection
+
+    local yPosButtons = 10
+
+    -- Auto Collect Toggle
+    local AutoCollectToggle = Instance.new("TextButton")
+    AutoCollectToggle.Size = UDim2.new(1, -10, 0, 35)
+    AutoCollectToggle.Position = UDim2.new(0, 5, 0, yPosButtons)
+    AutoCollectToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+    AutoCollectToggle.Text = "🔘 Auto Collect: OFF (Z)"
+    AutoCollectToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AutoCollectToggle.TextSize = 14
+    AutoCollectToggle.Font = Enum.Font.Gotham
+    AutoCollectToggle.Parent = ButtonsTab
+
+    local ToggleCornerBtn = Instance.new("UICorner")
+    ToggleCornerBtn.CornerRadius = UDim.new(0, 6)
+    ToggleCornerBtn.Parent = AutoCollectToggle
+
+    yPosButtons = yPosButtons + 45
+
+    -- Collect Speed Slider
+    local CollectSpeedLabel = Instance.new("TextLabel")
+    CollectSpeedLabel.Size = UDim2.new(1, -10, 0, 25)
+    CollectSpeedLabel.Position = UDim2.new(0, 5, 0, yPosButtons)
+    CollectSpeedLabel.BackgroundTransparency = 1
+    CollectSpeedLabel.Text = "Collect Speed: 0.1s"
+    CollectSpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CollectSpeedLabel.TextSize = 14
+    CollectSpeedLabel.Font = Enum.Font.Gotham
+    CollectSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
+    CollectSpeedLabel.Parent = ButtonsTab
+
+    local CollectSpeedSlider = Instance.new("Frame")
+    CollectSpeedSlider.Size = UDim2.new(1, -10, 0, 20)
+    CollectSpeedSlider.Position = UDim2.new(0, 5, 0, yPosButtons + 25)
+    CollectSpeedSlider.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+    CollectSpeedSlider.Parent = ButtonsTab
+
+    local CollectSpeedFill = Instance.new("Frame")
+    CollectSpeedFill.Size = UDim2.new(0.3, 0, 1, 0)
+    CollectSpeedFill.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+    CollectSpeedFill.Parent = CollectSpeedSlider
+
+    local SliderCornerBtn = Instance.new("UICorner")
+    SliderCornerBtn.CornerRadius = UDim.new(0, 4)
+    SliderCornerBtn.Parent = CollectSpeedSlider
+
+    local FillCornerBtn = Instance.new("UICorner")
+    FillCornerBtn.CornerRadius = UDim.new(0, 4)
+    FillCornerBtn.Parent = CollectSpeedFill
+
+    yPosButtons = yPosButtons + 55
+
+    -- Individual Collect Buttons
+    local buttonTypes = {
+        {name = "💎 Diamond Button", item = "BDiamond", color = Color3.fromRGB(0, 200, 255)},
+        {name = "🔮 Crystal Button", item = "BCrystal", color = Color3.fromRGB(200, 0, 255)},
+        {name = "⭐ Mega Button", item = "BMega", color = Color3.fromRGB(255, 255, 0)},
+        {name = "🔵 Basic Button", item = "BBasic", color = Color3.fromRGB(0, 100, 255)},
+        {name = "🚀 Ultra Button", item = "BUltra", color = Color3.fromRGB(255, 0, 0)},
+        {name = "🕵️ Secret Button", item = "BSecret", color = Color3.fromRGB(0, 255, 0)},
+        {name = "👑 Godly Button", item = "BGodly", color = Color3.fromRGB(255, 215, 0)}
+    }
+
+    -- Function to collect specific button type
+    local function CollectButtonType(itemName)
+        for i,v in pairs(game:GetDescendants()) do
+            if v.Name == itemName then
+                v.CFrame = Player.Character.HumanoidRootPart.CFrame
+            end
+        end
+        print("✅ Collected: " .. itemName)
+    end
+
+    -- Function to collect all buttons
+    local function CollectAllButtons()
+        for _, btnType in ipairs(buttonTypes) do
+            CollectButtonType(btnType.item)
+        end
+        print("✅ Collected ALL buttons!")
+    end
+
+    -- Create individual collect buttons
+    for i, btnType in ipairs(buttonTypes) do
+        local CollectBtn = Instance.new("TextButton")
+        CollectBtn.Size = UDim2.new(1, -10, 0, 30)
+        CollectBtn.Position = UDim2.new(0, 5, 0, yPosButtons)
+        CollectBtn.BackgroundColor3 = btnType.color
+        CollectBtn.Text = btnType.name
+        CollectBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        CollectBtn.TextSize = 12
+        CollectBtn.Font = Enum.Font.Gotham
+        CollectBtn.Parent = ButtonsTab
+        
+        local BtnCornerBtn = Instance.new("UICorner")
+        BtnCornerBtn.CornerRadius = UDim.new(0, 6)
+        BtnCornerBtn.Parent = CollectBtn
+        
+        CollectBtn.MouseButton1Click:Connect(function()
+            CollectButtonType(btnType.item)
+        end)
+        
+        yPosButtons = yPosButtons + 35
+    end
+
+    -- Collect All Button
+    local CollectAllBtn = Instance.new("TextButton")
+    CollectAllBtn.Size = UDim2.new(1, -10, 0, 35)
+    CollectAllBtn.Position = UDim2.new(0, 5, 0, yPosButtons + 10)
+    CollectAllBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
+    CollectAllBtn.Text = "🎯 COLLECT ALL BUTTONS"
+    CollectAllBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CollectAllBtn.TextSize = 14
+    CollectAllBtn.Font = Enum.Font.GothamBold
+    CollectAllBtn.Parent = ButtonsTab
+
+    local AllBtnCorner = Instance.new("UICorner")
+    AllBtnCorner.CornerRadius = UDim.new(0, 6)
+    AllBtnCorner.Parent = CollectAllBtn
+
+    CollectAllBtn.MouseButton1Click:Connect(CollectAllButtons)
+
+    -- Auto Collect Toggle Handler
+    AutoCollectToggle.MouseButton1Click:Connect(function()
+        autoCollectEnabled = not autoCollectEnabled
+        if autoCollectEnabled then
+            AutoCollectToggle.Text = "🔘 Auto Collect: ON (Z)"
+            AutoCollectToggle.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
+            
+            -- Start auto collect loop
+            collectConnection = RunService.Heartbeat:Connect(function()
+                if autoCollectEnabled then
+                    CollectAllButtons()
+                    wait(collectSpeed)
+                end
+            end)
+        else
+            AutoCollectToggle.Text = "🔘 Auto Collect: OFF (Z)"
+            AutoCollectToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            
+            -- Stop auto collect
+            if collectConnection then
+                collectConnection:Disconnect()
+            end
+        end
+    end)
+
+    -- Key bind for auto collect
+    UIS.InputBegan:Connect(function(input)
+        if input.KeyCode == collectKey then
+            autoCollectEnabled = not autoCollectEnabled
+            if autoCollectEnabled then
+                AutoCollectToggle.Text = "🔘 Auto Collect: ON (Z)"
+                AutoCollectToggle.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
+                
+                -- Start auto collect loop
+                collectConnection = RunService.Heartbeat:Connect(function()
+                    if autoCollectEnabled then
+                        CollectAllButtons()
+                        wait(collectSpeed)
+                    end
+                end)
+            else
+                AutoCollectToggle.Text = "🔘 Auto Collect: OFF (Z)"
+                AutoCollectToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+                
+                -- Stop auto collect
+                if collectConnection then
+                    collectConnection:Disconnect()
+                end
+            end
+        end
+    end)
+
+    -- ========== MOBS TAB ==========
+    local MobsTab = TabContents["MOBS"]
+    MobsTab.CanvasSize = UDim2.new(0, 0, 0, 500)
+
+    -- Mob paths
+    local mobs = {
+        {name = "👹 Tytyshur", path = "workspace.RespawnMobs.Tytyshur.Tytyshur"},
+        {name = "💪 Titan", path = "workspace.RespawnMobs.Titan.Titan"},
+        {name = "🍏 TheGreen", path = "workspace.RespawnMobs.TheGreen.TheGreen"},
+        {name = "👤 Robloxer", path = "workspace.RespawnMobs.Robloxer.Robloxer"},
+        {name = "👦 RobloxEgor", path = "workspace.RespawnMobs.RobloxEgor.RobloxEgor"},
+        {name = "💪 Muscle", path = "workspace.RespawnMobs.Muscle.Muscle"},
+        {name = "👩 Kira", path = "workspace.RespawnMobs.Kira.Kira"},
+        {name = "👶 Kid", path = "workspace.RespawnMobs.Kid.Kid"},
+        {name = "🍏 Green", path = "workspace.RespawnMobs.Green.Green"},
+        {name = "👨 Bob", path = "workspace.RespawnMobs.Bob.Bob"},
+        {name = "🔨 Basher", path = "workspace.RespawnMobs.Basher.Basher"},
+        {name = "🍌 Banana", path = "workspace.RespawnMobs.Banana.Banana"}
+    }
+
+    -- Function to teleport mob to player
+    local function TeleportMobToPlayer(mobPath, mobName)
+        local success, mob = pcall(function()
+            return game:GetService(mobPath)
+        end)
+        
+        if success and mob then
+            local char = Player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                mob.CFrame = char.HumanoidRootPart.CFrame
+                print("✅ Teleported: " .. mobName)
+            else
+                print("❌ Player character not found")
+            end
+        else
+            print("❌ Mob not found: " .. mobName)
+        end
+    end
+
+    -- Function to teleport all mobs
+    local function TeleportAllMobs()
+        for _, mob in ipairs(mobs) do
+            TeleportMobToPlayer(mob.path, mob.name)
+            wait(0.1) -- Small delay to avoid lag
+        end
+        print("✅ All mobs teleported!")
+    end
+
+    local yPosMobs = 10
+
+    -- Teleport All Mobs Button
+    local TeleportAllMobsBtn = Instance.new("TextButton")
+    TeleportAllMobsBtn.Size = UDim2.new(1, -10, 0, 40)
+    TeleportAllMobsBtn.Position = UDim2.new(0, 5, 0, yPosMobs)
+    TeleportAllMobsBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
+    TeleportAllMobsBtn.Text = "🎯 TELEPORT ALL MOBS"
+    TeleportAllMobsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TeleportAllMobsBtn.TextSize = 14
+    TeleportAllMobsBtn.Font = Enum.Font.GothamBold
+    TeleportAllMobsBtn.Parent = MobsTab
+
+    local AllMobsCorner = Instance.new("UICorner")
+    AllMobsCorner.CornerRadius = UDim.new(0, 6)
+    AllMobsCorner.Parent = TeleportAllMobsBtn
+
+    TeleportAllMobsBtn.MouseButton1Click:Connect(TeleportAllMobs)
+
+    yPosMobs = yPosMobs + 50
+
+    -- Create individual mob buttons
+    for i, mob in ipairs(mobs) do
+        local MobBtn = Instance.new("TextButton")
+        MobBtn.Size = UDim2.new(1, -10, 0, 35)
+        MobBtn.Position = UDim2.new(0, 5, 0, yPosMobs)
+        MobBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        MobBtn.Text = mob.name
+        MobBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        MobBtn.TextSize = 13
+        MobBtn.Font = Enum.Font.Gotham
+        MobBtn.Parent = MobsTab
+        
+        local MobCorner = Instance.new("UICorner")
+        MobCorner.CornerRadius = UDim.new(0, 6)
+        MobCorner.Parent = MobBtn
+        
+        MobBtn.MouseButton1Click:Connect(function()
+            TeleportMobToPlayer(mob.path, mob.name)
+        end)
+        
+        yPosMobs = yPosMobs + 40
+    end
 
     -- ========== LOCAL PLAYER TAB ==========
     local LocalTab = TabContents["LOCAL PLAYER"]
@@ -551,7 +825,7 @@ function LoadMainScript()
     InfoText.Size = UDim2.new(1, -10, 1, -10)
     InfoText.Position = UDim2.new(0, 5, 0, 5)
     InfoText.BackgroundTransparency = 1
-    InfoText.Text = "Trade Strength Hub Premium\nby Angry66gsjjdYT\n\nVersion: 2.0\nKey System: ACTIVE\n\nFeatures:\n• 4 Teleport Positions\n• Auto Farm System\n• Local Player Scripts\n• Custom Settings\n• Noclip & Speed Hacks\n\nControls:\nF - Next Position\nRightShift - Toggle GUI"
+    InfoText.Text = "Trade Strength Hub Premium\nby Angry66gsjjdYT\n\nVersion: 2.0\nKey System: ACTIVE\n\nFeatures:\n• 4 Teleport Positions\n• Auto Farm System\n• Button Collector\n• Mob Teleporter\n• Local Player Scripts\n• Custom Settings\n\nControls:\nF - Next Position\nZ - Auto Collect\nRightShift - Toggle GUI"
     InfoText.TextColor3 = Color3.fromRGB(255, 255, 255)
     InfoText.TextSize = 12
     InfoText.Font = Enum.Font.Gotham
@@ -574,8 +848,8 @@ function LoadMainScript()
 
     print("🚀 Trade Strength Hub Premium loaded!")
     print("🔐 Key System: ACTIVE")
-    print("🎯 Controls: F - Next Position, RightShift - Toggle GUI")
-    print("📱 Tabs: Main, Local Player, Settings, Info")
+    print("🎯 Controls: F - Next Position, Z - Auto Collect, RightShift - Toggle GUI")
+    print("📱 Tabs: Main, Buttons, Mobs, Local Player, Settings, Info")
 end
 
 -- INIT - Ключ-система показывается ВСЕМ
