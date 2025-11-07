@@ -1,0 +1,17 @@
+{
+    "valid_keys": [
+        "ANGRY666",
+        "PREMIUM123",
+        "TESTKEY456"
+    ],
+    "whitelist": [
+        "Angry66gsjjdYT",
+        "YourFriend1",
+        "YourFriend2"
+    ],
+    "settings": {
+        "version": "2.0",
+        "author": "Angry66gsjjdYT",
+        "update_url": "https://github.com/YourUsername/YourRepo/main/script.lua"
+    }
+}
